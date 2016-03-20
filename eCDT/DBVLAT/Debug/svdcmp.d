@@ -1,0 +1,1 @@
+svdcmp.o: ../svdcmp.c
