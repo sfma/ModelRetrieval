@@ -1,12 +1,9 @@
 /*
- * pointSVD.c
+ * CPCA.c
  *
- *  Created on: Mar 18, 2016
+ *  Created on: Mar 21, 2016
  *      Author: sfma
- *
- *  Description:
- *  	pointSVD to normalize the model.
- *  	"Multi-Fourier spectra descriptor and augmentation with spectral clustering for 3D shape retrieval" by Atsushi Tatsuma and Masaki Aono
+*   Description: This is very similar to pointSVD. The difference is that it use eigenvalue and eigenvector instead of SVD.
  */
 
 #include "Ds.h"
@@ -17,17 +14,15 @@
 #include "Rotate.h"
 #include "svdcmp.h"
 #include "GenerateRandomPoints.h"
+#include "eispack.h"
 //#include "svd.h"
 
 #define sign(a)  (((a)<0) ? -1: ((a)>0))
 
 //Function declaration
-void pointSVD(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer newVertex);
+void CPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer newVertex);
 
-
-
-
-void pointSVD(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer newVertex){
+void CPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer newVertex){
 	/*
 	 * m is the total number of points sampled on the surface.
 	 */
@@ -109,10 +104,9 @@ void pointSVD(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer ne
 	}
 
 
-	/*//generate covariance matrix
-	double *covMat[3];
+	//generate covariance matrix
+	double covMat[3][3];
 	for(i=0;i<3;i++){
-		covMat[i]=(double *)malloc(3*sizeof(double));
 		for(j=0;j<3;j++){
 			covMat[i][j]=0;
 		}
@@ -125,51 +119,36 @@ void pointSVD(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer ne
 				covMat[j][k]+=vec[j]*vec[k];
 			}
 		}
-	}*/
+	}
 
 	//free pSamples
 	free(pSamples);
 
-	//before function svdcmp destroy matrix P, copy it
-	double *copyP[3];
+	//eigenvalue and eigenvector
+	double A[9];
+	k=0;
 	for(i=0;i<3;i++){
-		copyP[i]=(double *)malloc(m*sizeof(double));
-		for(j=0;j<m;j++){
-			copyP[i][j]=matrixP[i][j];
+		for(j=0;j<3;j++){
+			A[k]=covMat[i][j];
+			k++;
 		}
 	}
+	double w[3];
+	double Z[9];
+	rs(3,A,w,1,Z);
 
-	//check matrix copyP
-	char fpName[100]="/Users/sfma/Desktop/copy.off";
-	FILE *fCopyP=fopen(fpName,"w");
-	fprintf(fCopyP,"OFF\n");
-	fprintf(fCopyP,"%d %d %d\n",m, NumMyTri,0);
-	for(i=0;i<m;i++){
-		fprintf(fCopyP,"%f %f %f\n",pSamples[i].coor[0],pSamples[i].coor[1],pSamples[i].coor[2]);
-	}
-	fclose(fCopyP);
-
-	//SVD
-	double *w=(double *)malloc(m);
-	double *v[m];
-	for(i=0;i<m;i++)
-	{
-		v[i]=(double *)malloc(m*sizeof(double));
-	}
-
-	svdcmp(matrixP,3,m,w,v);
-	//dsvd(matrixP,3,m,w,v);
-	free(w);
-	for(i=0;i<m;i++){
-		free(v[i]);
-	}
-
-	//Now matrixP is U. Transpose it to get Q.
+	//Get Q.
 	double Q[3][3];
+	k=0;
+	for(i=0;i<3;i++){
+		for(j=0;j<3;j++){
+			Q[i][j]=Z[k];
+			k++;
+		}
+	}
 	double length[3]={0,0,0};
 	for(i=0;i<3;i++){
 		for(j=0;j<3;j++){
-			Q[i][j]=matrixP[j][i];
 			length[i]+=pow(Q[i][j],2);
 		}
 		length[i]=sqrt(length[i]);
@@ -192,7 +171,7 @@ void pointSVD(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer ne
 		{
 			double sum=0;
 			for(k=0;k<3;k++){
-				sum+=Q[i][k]*copyP[k][j];
+				sum+=Q[i][k]*matrixP[k][j];
 			}
 			P1[i][j]=sum;
 		}
@@ -210,7 +189,6 @@ void pointSVD(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer ne
 	//free matrix P (since we have Q now) and copyP
 	for(i=0;i<3;i++){
 		free(matrixP[i]);
-		free(copyP[i]);
 	}
 
 	double f[3]={0,0,0};

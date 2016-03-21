@@ -231,6 +231,7 @@ void SaveObj(char *filename, pVer vertex, pTri triangle, int NumVer, int NumTri)
 	for(i=0; i<NumTri; i++)
 	{
 		fprintf(fpt, "f");
+		//printf("NodeName: %d.\n",triangle[i].NodeName);
 		for(j=0; j<triangle[i].NodeName; j++)	// record the number of vertex in this triangle
 			fprintf(fpt, " %d", triangle[i].v[j]+1);
 		fprintf(fpt, "\n");
