@@ -15,7 +15,8 @@
 
 #define m 1000
 
-int main(){
+int testPSVD(){
+//int main(){
 	char prefix[100]="/Users/sfma/3Dretrieval/Executable/pton_obj_data/";
 	char filename1[100];
 	char filename2[100];

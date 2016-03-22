@@ -28,7 +28,7 @@ all: DBVLAT
 DBVLAT: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MacOS X C Linker'
-	gcc  -o "DBVLAT" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -L/opt/X11/lib -o "DBVLAT" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

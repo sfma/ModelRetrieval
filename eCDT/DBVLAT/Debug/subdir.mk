@@ -9,6 +9,7 @@ C_SRCS += \
 ../Main.c \
 ../RWObj.c \
 ../Rotate.c \
+../depthImage.c \
 ../eispack.c \
 ../pointSVD.c \
 ../svd.c \
@@ -21,6 +22,7 @@ OBJS += \
 ./Main.o \
 ./RWObj.o \
 ./Rotate.o \
+./depthImage.o \
 ./eispack.o \
 ./pointSVD.o \
 ./svd.o \
@@ -33,6 +35,7 @@ C_DEPS += \
 ./Main.d \
 ./RWObj.d \
 ./Rotate.d \
+./depthImage.d \
 ./eispack.d \
 ./pointSVD.d \
 ./svd.d \
@@ -44,7 +47,7 @@ C_DEPS += \
 %.o: ../%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
-	gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	gcc -I/opt/X11/include -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
