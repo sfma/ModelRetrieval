@@ -9,14 +9,13 @@
 #include "Ds.h"
 #include "RWObj.h"
 #include "pointSVD.h"
-#include "CPCA.h"
 #include <string.h>
 #include <stdio.h>
 
 #define m 1000
 
-int testPSVD(){
-//int main(){
+//int testPSVD(){
+int main(){
 	char prefix[100]="/Users/sfma/3Dretrieval/Executable/pton_obj_data/";
 	char filename1[100];
 	char filename2[100];
@@ -50,10 +49,8 @@ int testPSVD(){
 
 	pVer newVertex1=(pVer)malloc(NumVer1*sizeof(Ver));
 	pVer newVertex2=(pVer)malloc(NumVer2*sizeof(Ver));
-	//pointSVD(m, vertex1, NumVer1, triangle1, NumTri1, newVertex1);
-	//pointSVD(m, vertex2, NumVer2, triangle2, NumTri2, newVertex2);
-	CPCA(m, vertex1, NumVer1, triangle1, NumTri1, newVertex1);
-	CPCA(m, vertex2, NumVer2, triangle2, NumTri2, newVertex2);
+	pointSVD(m, vertex1, NumVer1, triangle1, NumTri1, newVertex1);
+	pointSVD(m, vertex2, NumVer2, triangle2, NumTri2, newVertex2);
 	free(vertex1);
 	free(vertex2);
 	char out1[100],out2[100];

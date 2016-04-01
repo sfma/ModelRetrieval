@@ -32,8 +32,11 @@ double AreaOfTri(pVer vertex, Tri ATriangle){
 	v3.z=vertex[ATriangle.v[2]].coor[2];
 
 	vector vec1, vec2;
-	vec1.x=v3.x-v1.x; vec1.y=v3.y-v1.y; vec1.z=v3.z-v1.z;
-	vec2.x=v3.x-v2.x; vec2.y=v3.y-v2.y; vec2.z=v3.z-v2.z;
+	//vec1.x=v3.x-v1.x; vec1.y=v3.y-v1.y; vec1.z=v3.z-v1.z;
+	//vec2.x=v3.x-v2.x; vec2.y=v3.y-v2.y; vec2.z=v3.z-v2.z;
+
+	vec1.x=v2.x-v1.x; vec1.y=v2.y-v1.y; vec1.z=v2.z-v1.z;
+	vec2.x=v3.x-v1.x; vec2.y=v3.y-v1.y; vec2.z=v3.z-v1.z;
 
 	vector vec=cross(vec1, vec2);
 	double area;
