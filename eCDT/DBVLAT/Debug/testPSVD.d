@@ -1,4 +1,4 @@
-testPSVD.o: ../testPSVD.c ../Ds.h ../RWObj.h ../pointSVD.h ../CPCA.h
+testPSVD.o: ../testPSVD.c ../Ds.h ../RWObj.h ../pointSVD.h ../RWOFF.h
 
 ../Ds.h:
 
@@ -6,4 +6,4 @@ testPSVD.o: ../testPSVD.c ../Ds.h ../RWObj.h ../pointSVD.h ../CPCA.h
 
 ../pointSVD.h:
 
-../CPCA.h:
+../RWOFF.h:

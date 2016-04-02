@@ -4,39 +4,42 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../CPCA.c \
 ../GenerateRandomPoints.c \
 ../Main.c \
+../RWOFF.c \
 ../RWObj.c \
 ../Rotate.c \
 ../depthImage.c \
 ../eispack.c \
+../pointPCA.c \
 ../pointSVD.c \
 ../svd.c \
 ../svdcmp.c \
 ../testPSVD.c 
 
 OBJS += \
-./CPCA.o \
 ./GenerateRandomPoints.o \
 ./Main.o \
+./RWOFF.o \
 ./RWObj.o \
 ./Rotate.o \
 ./depthImage.o \
 ./eispack.o \
+./pointPCA.o \
 ./pointSVD.o \
 ./svd.o \
 ./svdcmp.o \
 ./testPSVD.o 
 
 C_DEPS += \
-./CPCA.d \
 ./GenerateRandomPoints.d \
 ./Main.d \
+./RWOFF.d \
 ./RWObj.d \
 ./Rotate.d \
 ./depthImage.d \
 ./eispack.d \
+./pointPCA.d \
 ./pointSVD.d \
 ./svd.d \
 ./svdcmp.d \

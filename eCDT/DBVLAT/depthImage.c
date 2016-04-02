@@ -43,12 +43,13 @@ void reshape(){
 
 }
 
+/*
 int main(int argc, char **argv){
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowPosition(200,200);
 	glutInitWindowSize(winWidth,winHeight);
-	glutCreatWindow(argv[0]);
+	glutCreateWindow(argv[0]);
 	init();
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
@@ -56,5 +57,6 @@ int main(int argc, char **argv){
 	glutMainLoop();
 	return 0;
 }
+*/
 
 

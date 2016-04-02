@@ -1,12 +1,8 @@
 /*
- * pointSVD.c
+ * pointPCA.c
  *
- *  Created on: Mar 18, 2016
+ *  Created on: Apr 2, 2016
  *      Author: sfma
- *
- *  Description:
- *  	pointSVD to normalize the model.
- *  	"Multi-Fourier spectra descriptor and augmentation with spectral clustering for 3D shape retrieval" by Atsushi Tatsuma and Masaki Aono
  */
 
 #include "Ds.h"
@@ -15,19 +11,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "Rotate.h"
-#include "svdcmp.h"
+#include "eispack.h"
 #include "GenerateRandomPoints.h"
 //#include "svd.h"
 
 #define sign(a)  (((a)<0) ? -1: ((a)>0))
 
 //Function declaration
-void pointSVD(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer newVertex);
+void pointPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer newVertex);
 
 
 
 
-void pointSVD(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer newVertex){
+void pointPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer newVertex){
 	/*
 	 * m is the total number of points sampled on the surface.
 	 */
@@ -109,7 +105,7 @@ void pointSVD(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer ne
 	}
 
 
-	/*//generate covariance matrix
+	//generate covariance matrix
 	double *covMat[3];
 	for(i=0;i<3;i++){
 		covMat[i]=(double *)malloc(3*sizeof(double));
@@ -125,7 +121,7 @@ void pointSVD(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer ne
 				covMat[j][k]+=vec[j]*vec[k];
 			}
 		}
-	}*/
+	}
 
 	//free pSamples
 	free(pSamples);
@@ -149,27 +145,17 @@ void pointSVD(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer ne
 	}
 	fclose(fCopyP);
 
-	//SVD
-	double *w=(double *)malloc(m);
-	double *v[m];
-	for(i=0;i<m;i++)
-	{
-		v[i]=(double *)malloc(m*sizeof(double));
-	}
+	//PCA to get eigenvectors
+	double W[3];
+	double Z[3][3];
+	rs(3,covMat,W,1,Z);
 
-	svdcmp(matrixP,3,m,w,v);
-	//dsvd(matrixP,3,m,w,v);
-	free(w);
-	for(i=0;i<m;i++){
-		free(v[i]);
-	}
-
-	//Now matrixP is U. Transpose it to get Q.
+	//get Q.
 	double Q[3][3];
 	double length[3]={0,0,0};
 	for(i=0;i<3;i++){
 		for(j=0;j<3;j++){
-			Q[i][j]=matrixP[j][i];
+			Q[i][j]=Z[i][j];
 			length[i]+=pow(Q[i][j],2);
 		}
 		length[i]=sqrt(length[i]);
@@ -355,5 +341,3 @@ void pointSVD(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer ne
 	free(myTriangle);
 	free(area);
 }
-
-
