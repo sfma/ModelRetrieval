@@ -8,7 +8,7 @@
  */
 #include "Ds.h"
 #include "RWObj.h"
-#include "pointSVD.h"
+#include "normalPCA.h"
 #include "RWOFF.h"
 #include <string.h>
 #include <stdio.h>
@@ -23,8 +23,8 @@ int main(){
 	char filename2[100];
 	strcpy(filename1,prefix);
 	strcpy(filename2,prefix);
-	strcat(filename1,"m1170");
-	strcat(filename2,"m1171");
+	strcat(filename1,"m70");
+	strcat(filename2,"m71");
 	pVer vertex1, vertex2;
 	pTri triangle1, triangle2;
 	int NumVer1, NumVer2;
@@ -51,8 +51,11 @@ int main(){
 	pVer newVertex2=(pVer)malloc(NumVer2*sizeof(Ver));
 	//pointSVD(m, vertex1, NumVer1, triangle1, NumTri1, newVertex1);
 	//pointSVD(m, vertex2, NumVer2, triangle2, NumTri2, newVertex2);
-	pointPCA(m, vertex1, NumVer1, triangle1, NumTri1, newVertex1);
-	pointPCA(m, vertex2, NumVer2, triangle2, NumTri2, newVertex2);
+
+	//pointPCA(m, vertex1, NumVer1, triangle1, NumTri1, newVertex1);
+	//pointPCA(m, vertex2, NumVer2, triangle2, NumTri2, newVertex2);
+	normalPCA(m, vertex1, NumVer1, triangle1, NumTri1, newVertex1);
+	normalPCA(m, vertex2, NumVer2, triangle2, NumTri2, newVertex2);
 	free(vertex1);
 	free(vertex2);
 	char out1[100],out2[100];
@@ -68,6 +71,8 @@ int main(){
 	strcat(out2,"out2.off");
 	writeOff(out1,newVertex1,NumVer1,triangle1,NumTri1);
 	writeOff(out2,newVertex2,NumVer2,triangle2,NumTri2);
+
+
 	free(newVertex1);
 	free(newVertex2);
 

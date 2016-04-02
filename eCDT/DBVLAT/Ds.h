@@ -148,6 +148,7 @@ typedef struct Meterial_ {
 
 #ifndef	PARA_
 #define PARA_
+
 	#define	WIDTH			256
 	#define HEIGHT			256
 //	#define	TOTAL_PIXEL		65025	// 255x255 (WIDTH*HEIGHT)

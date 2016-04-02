@@ -1,8 +1,11 @@
 /*
- * pointPCA.c
+ * normalPCA.c
  *
  *  Created on: Apr 2, 2016
  *      Author: sfma
+*   Description: normalPCA, well, normalSVD proposed in "Multi-Fourier spectra descriptor and augmentation with
+*   spectral clustering for 3D shape retrieval", whose implementation has much in common to pointPCA. Because I
+*   cannot find a stable svd implementation in c for now, I use pca instead.
  */
 
 #include "Ds.h"
@@ -18,12 +21,24 @@
 #define sign(a)  (((a)<0) ? -1: ((a)>0))
 
 //Function declaration
-void pointPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer newVertex);
+double *FindNormalCenter(double **normals, int m);
+void normalPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer newVertex);
 
+double *FindNormalCenter(double **normals, int m){
+	static double center[3]={0,0,0};
+	int i;
+	for(i=0;i<m;i++){
+		center[0]+=normals[0][i];
+		center[1]+=normals[1][i];
+		center[2]+=normals[2][i];
+	}
+	center[0]/=m;
+	center[1]/=m;
+	center[2]/=m;
+	return center;
+}
 
-
-
-void pointPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer newVertex){
+void normalPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer newVertex){
 	/*
 	 * m is the total number of points sampled on the surface.
 	 */
@@ -62,10 +77,18 @@ void pointPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer ne
 	/*char ftri[100]="/Users/sfma/Desktop/triangleModel.obj";
 	SaveObj(ftri,vertex,myTriangle,NumVer,NumMyTri);*/
 
-	//Randomly sampling on the surface of the polygon mesh
+	/*Randomly sampling is slightly different from pointPCA. What they have in common is that they both sample points.
+	 * The difference is that, normalPCA also use vertices on the trianle.
+	 */
+	printf("here? Before normals.\n");
+	double *normals[3];
+	for(i=0;i<3;i++){
+		normals[i]=(double *)malloc(m*sizeof(double));
+	}
 	pVer pSamples=(pVer)malloc(m*sizeof(Ver));
 	k=0;
 	//printf("totalarea of %d faces is %f.\n",NumMyTri,totalArea);
+	int l,p,q;
 	for(i=0;i<NumMyTri;i++){
 		//printf("Area of %dth triangle is %f.\n",i,area[i]);
 		int numSamples=(int)(area[i]/totalArea*m);
@@ -74,12 +97,63 @@ void pointPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer ne
 				printf("This time the algorithm selects face %d, its area is %f, while total area is %f.\n",i,area[i],totalArea);
 			}*/
 			pSamples[k]=generatePoints(vertex,myTriangle[i]);
+			//use the sampled point and two vertices of a triangle to generate the normal
+			vector tmpvec1, tmpvec2;
+			vector normVec;
+			double norm=0;
+
+			tmpvec1.x=vertex[myTriangle[i].v[0]].coor[0]-pSamples[k].coor[0];
+			tmpvec1.y=vertex[myTriangle[i].v[0]].coor[1]-pSamples[k].coor[1];
+			tmpvec1.z=vertex[myTriangle[i].v[0]].coor[2]-pSamples[k].coor[2];
+			tmpvec2.x=vertex[myTriangle[i].v[1]].coor[0]-pSamples[k].coor[0];
+			tmpvec2.y=vertex[myTriangle[i].v[1]].coor[1]-pSamples[k].coor[1];
+			tmpvec2.z=vertex[myTriangle[i].v[1]].coor[2]-pSamples[k].coor[2];
+
+			normVec=cross(tmpvec1, tmpvec2);
+			norm=pow(normVec.x,2)+pow(normVec.y,2)+pow(normVec.z,2);
+			norm=sqrt(norm);
+			normVec.x/=(norm);
+			normVec.y/=(norm);
+			normVec.z/=(norm);
+			//printf("norm:%f \n",norm);
+			//printf("%f\t%f\t%f\n",normVec.x,normVec.y,normVec.z);
+
+			normals[0][k]=normVec.x;
+			normals[1][k]=normVec.y;
+			normals[2][k]=normVec.z;
 			k++;
 		}
 	}
 	for(;k<m;k++){
 		int randindx=(int)(((double)rand())/RAND_MAX*(NumMyTri-1));
 		pSamples[k]=generatePoints(vertex, myTriangle[randindx]);
+
+		vector tmpvec1, tmpvec2;
+		vector normVec;
+		double norm=0;
+
+		tmpvec1.x=vertex[myTriangle[randindx].v[0]].coor[0]-pSamples[k].coor[0];
+		tmpvec1.y=vertex[myTriangle[randindx].v[0]].coor[1]-pSamples[k].coor[1];
+		tmpvec1.z=vertex[myTriangle[randindx].v[0]].coor[2]-pSamples[k].coor[2];
+		tmpvec2.x=vertex[myTriangle[randindx].v[1]].coor[0]-pSamples[k].coor[0];
+		tmpvec2.y=vertex[myTriangle[randindx].v[1]].coor[1]-pSamples[k].coor[1];
+		tmpvec2.z=vertex[myTriangle[randindx].v[1]].coor[2]-pSamples[k].coor[2];
+
+
+		//printf("%f\t%f\t%f\n",tmpvec1.x,tmpvec1.y,tmpvec1.z);
+		//printf("%f\t%f\t%f\n",tmpvec2.x,tmpvec2.y,tmpvec2.z);
+		normVec=cross(tmpvec1, tmpvec2);
+		norm=pow(normVec.x,2)+pow(normVec.y,2)+pow(normVec.z,2);
+		norm=sqrt(norm);
+		normVec.x/=(norm);
+		normVec.y/=(norm);
+		normVec.z/=(norm);
+		//printf("norm:%f \n",norm);
+		//printf("%f\t%f\t%f\n",normVec.x,normVec.y,normVec.z);
+
+		normals[0][k]=normVec.x;
+		normals[1][k]=normVec.y;
+		normals[2][k]=normVec.z;
 	}
 	free(myTriangle);
 	free(area);
@@ -94,15 +168,17 @@ void pointPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer ne
 	}
 	fclose(fsam);*/
 
-	//Find the center of the samples
-	Ver center=FindCenter(pSamples, m);
-
-	//create matrix P
-	double *matrixP[3];
+	//Find the center of the normals
+	double *normalCenter;
+	normalCenter=FindNormalCenter(normals, m);
 	for(i=0;i<3;i++){
-		matrixP[i]=(double *)malloc(m*sizeof(double));
+		printf("%f\t",normalCenter[i]);
+	}
+	printf("\n");
+
+	for(i=0;i<3;i++){
 		for(j=0;j<m;j++){
-			matrixP[i][j]=pSamples[j].coor[i]-center.coor[i];
+			normals[i][j]=normals[i][j]-normalCenter[i];
 		}
 	}
 
@@ -114,74 +190,51 @@ void pointPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer ne
 			covMat[i][j]=0;
 		}
 	}
-	/*printf("==========covMat============\n");
-	for(i=0;i<3;i++){
-		for(j=0;j<3;j++){
-			printf("%f\t",covMat[i][j]);
-		}
-		printf("\n");
-	}*/
-	/*for(i=0;i<m;i++){
-		double vec[3];
-		for(j=0;j<3;j++){
-			vec[j]=pSamples[i].coor[j]-center.coor[j];
-			for(k=0;k<3;k++){
-				covMat[j][k]+=vec[j]*vec[k];//wrong here. Because k grows faster than j, while vec[k] has not been updated.
-			}
-		}
-	}*/
+
 	//use matrix multiplication to get covariance matrix
-	double *matrixPT[m];
+	double *normalsTrans[m];
 	for(i=0;i<m;i++){
-		matrixPT[i]=(double *)malloc(3*sizeof(double));
+		normalsTrans[i]=(double *)malloc(3*sizeof(double));
 	}
 	for(i=0;i<m;i++){
 		for(j=0;j<3;j++){
-			matrixPT[i][j]=matrixP[j][i];
+			normalsTrans[i][j]=normals[j][i];
 		}
 	}
 	for(i=0;i<3;i++){
 		for(j=0;j<3;j++){
 			double sum=0;
 			for(k=0;k<m;k++){
-				sum+=matrixP[i][k]*matrixPT[k][j];
+				sum+=normals[i][k]*normalsTrans[k][j];
 			}
 			covMat[i][j]=sum;
 		}
 	}
-	/*printf("==========covMat============\n");
+	printf("==========covMat============\n");
 	for(i=0;i<3;i++){
 		for(j=0;j<3;j++){
 			printf("%f\t",covMat[i][j]);
 		}
 		printf("\n");
-	}*/
+	}
+
 
 	for(i=0;i<m;i++){
-		free(matrixPT[i]);
+		free(normalsTrans[i]);
 	}
 
 	//free pSamples
 	free(pSamples);
 
 	//before function svdcmp destroy matrix P, copy it
-	double *copyP[3];
+	double *copyN[3];
 	for(i=0;i<3;i++){
-		copyP[i]=(double *)malloc(m*sizeof(double));
+		copyN[i]=(double *)malloc(m*sizeof(double));
 		for(j=0;j<m;j++){
-			copyP[i][j]=matrixP[i][j];
+			copyN[i][j]=normals[i][j];
 		}
 	}
 
-	//check matrix copyP
-	char fpName[100]="/Users/sfma/Desktop/copy.off";
-	FILE *fCopyP=fopen(fpName,"w");
-	fprintf(fCopyP,"OFF\n");
-	fprintf(fCopyP,"%d %d %d\n",m, NumMyTri,0);
-	for(i=0;i<m;i++){
-		fprintf(fCopyP,"%f %f %f\n",pSamples[i].coor[0],pSamples[i].coor[1],pSamples[i].coor[2]);
-	}
-	fclose(fCopyP);
 
 	//PCA to get eigenvectors
 	double A[3*3];
@@ -270,25 +323,16 @@ void pointPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer ne
 		{
 			double sum=0;
 			for(k=0;k<3;k++){
-				sum+=Q[i][k]*copyP[k][j];
+				sum+=Q[i][k]*copyN[k][j];
 			}
 			P1[i][j]=sum;
 		}
 	}
-	//Is P' normal? Create an off file to test it.
-	char fp1Name[100]="/Users/sfma/Desktop/p1.off";
-	FILE *fp1=fopen(fp1Name,"w");
-	fprintf(fp1,"OFF\n");
-	fprintf(fp1,"%d %d %d\n",m, 0,0);
-	for(i=0;i<m;i++){
-		fprintf(fp1,"%f %f %f\n",P1[0][i],P1[1][i],P1[2][i]);
-	}
-	fclose(fp1);
 
 	//free matrix P (since we have Q now) and copyP
 	for(i=0;i<3;i++){
-		free(matrixP[i]);
-		free(copyP[i]);
+		free(normals[i]);
+		free(copyN[i]);
 	}
 
 	double f[3]={0,0,0};
@@ -325,27 +369,25 @@ void pointPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer ne
 		V1[i]=(double *)malloc(NumVer*sizeof(double));
 	}
 
+	for(i=0;i<3;i++){
+		for(j=0;j<m;j++){
+			V[i][j]=vertex[j].coor[i];
+		}
+	}
+	//double *verticesCenter;
+	//verticesCenter=FindNormalCenter(V,NumVer);
+	double verticesCenter[3]={0,0,0};
+	printf("==============Center of Vertices===============\n");
+	for(i=0;i<3;i++){
+		printf("%f\t",verticesCenter[i]);
+	}
+	printf("\n");
 	for(i=0;i<3;i++)
 	{
 		for(j=0;j<NumVer;j++){
-			V[i][j]=vertex[j].coor[i]-center.coor[i];
+			V[i][j]=vertex[j].coor[i]-verticesCenter[i];
 		}
 	}
-
-
-	pVer TranslatedVertex=(pVer)malloc(NumVer*sizeof(Ver));
-	if(TranslatedVertex==NULL){
-		printf("Allocating space for the translated model failed.\n");
-	}
-	for(i=0;i<NumVer;i++){
-		for(j=0;j<3;j++){
-			TranslatedVertex[i].coor[j]=V[j][i];
-		}
-	}
-	char fname[100]="Users/sfma/Desktop/TranslatedModel.off";
-	printf("About to write the translated model.\n");
-	writeOff(fname,TranslatedVertex,NumVer,triangle,NumTri);
-	free(TranslatedVertex);
 
 	printf("tmp=FQ\n");
 	double tmp[3][3];

@@ -54,7 +54,6 @@ int ReadMeterial(char *filename, pMeterial *color)
 
 int ReadObj(char *filename, pVer *vertex, pTri *triangle, int *NumVer, int *NumTri)
 {
-	printf("Function ReadObj.\n");
 	FILE		*fpt;
 	char		input[LINE_MAX_LEN];
 	char		token[LINE_MAX_LEN];

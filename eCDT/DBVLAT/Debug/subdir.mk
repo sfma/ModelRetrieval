@@ -9,8 +9,8 @@ C_SRCS += \
 ../RWOFF.c \
 ../RWObj.c \
 ../Rotate.c \
-../depthImage.c \
 ../eispack.c \
+../normalPCA.c \
 ../pointPCA.c \
 ../pointSVD.c \
 ../svd.c \
@@ -23,8 +23,8 @@ OBJS += \
 ./RWOFF.o \
 ./RWObj.o \
 ./Rotate.o \
-./depthImage.o \
 ./eispack.o \
+./normalPCA.o \
 ./pointPCA.o \
 ./pointSVD.o \
 ./svd.o \
@@ -37,8 +37,8 @@ C_DEPS += \
 ./RWOFF.d \
 ./RWObj.d \
 ./Rotate.d \
-./depthImage.d \
 ./eispack.d \
+./normalPCA.d \
 ./pointPCA.d \
 ./pointSVD.d \
 ./svd.d \
