@@ -23,8 +23,8 @@ int main(){
 	char filename2[100];
 	strcpy(filename1,prefix);
 	strcpy(filename2,prefix);
-	strcat(filename1,"m200");
-	strcat(filename2,"m1");
+	strcat(filename1,"m1170");
+	strcat(filename2,"m1171");
 	pVer vertex1, vertex2;
 	pTri triangle1, triangle2;
 	int NumVer1, NumVer2;

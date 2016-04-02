@@ -113,14 +113,51 @@ void pointPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer ne
 			covMat[i][j]=0;
 		}
 	}
-	for(i=0;i<m;i++){
+	printf("==========covMat============\n");
+	for(i=0;i<3;i++){
+		for(j=0;j<3;j++){
+			printf("%f\t",covMat[i][j]);
+		}
+		printf("\n");
+	}
+	/*for(i=0;i<m;i++){
 		double vec[3];
 		for(j=0;j<3;j++){
 			vec[j]=pSamples[i].coor[j]-center.coor[j];
 			for(k=0;k<3;k++){
-				covMat[j][k]+=vec[j]*vec[k];
+				covMat[j][k]+=vec[j]*vec[k];//wrong here. Because k grows faster than j, while vec[k] has not been updated.
 			}
 		}
+	}*/
+	//use matrix multiplication to get covariance matrix
+	double *matrixPT[m];
+	for(i=0;i<m;i++){
+		matrixPT[i]=(double *)malloc(3*sizeof(double));
+	}
+	for(i=0;i<m;i++){
+		for(j=0;j<3;j++){
+			matrixPT[i][j]=matrixP[j][i];
+		}
+	}
+	for(i=0;i<3;i++){
+		for(j=0;j<3;j++){
+			double sum=0;
+			for(k=0;k<m;k++){
+				sum+=matrixP[i][k]*matrixPT[k][j];
+			}
+			covMat[i][j]=sum;
+		}
+	}
+	printf("==========covMat============\n");
+	for(i=0;i<3;i++){
+		for(j=0;j<3;j++){
+			printf("%f\t",covMat[i][j]);
+		}
+		printf("\n");
+	}
+
+	for(i=0;i<m;i++){
+		free(matrixPT[i]);
 	}
 
 	//free pSamples
@@ -146,16 +183,45 @@ void pointPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer ne
 	fclose(fCopyP);
 
 	//PCA to get eigenvectors
+	double A[3*3];
+	for(i=0;i<3;i++){
+		for(j=0;j<3;j++){
+			A[i*3+j]=covMat[i][j];
+		}
+	}
 	double W[3];
 	double Z[3][3];
-	rs(3,covMat,W,1,Z);
+	rs(3,A,W,1,Z);
+	printf("====W====\n");
+	for(i=0;i<3;i++){
+		printf("%f\n",W[i]);
+	}
+	//test the eigenvalues and eigenvectors
+	int row=0;
+	//step1. covMat * Z[0] and W[0]*Z[0]
+	double tempVec1[3], tempVec2[3];
+	for(i=0;i<3;i++){
+		tempVec1[i]=0;
+		for(j=0;j<3;j++){
+			tempVec1[i]+=covMat[i][j]*Z[row][j];
+		}
+	}
+	for(i=0;i<3;i++){
+		tempVec2[i]=W[row]*Z[row][i];
+	}
+	printf("Au and lambda*u\n");
+	for(i=0;i<3;i++){
+		printf("%f %f\n",tempVec1[i],tempVec2[i]);
+	}
+	//So I see that the eigenvectors are organized by rows.
+	//Note that eigenvalues are in ascending order.
 
 	//get Q.
 	double Q[3][3];
 	double length[3]={0,0,0};
 	for(i=0;i<3;i++){
 		for(j=0;j<3;j++){
-			Q[i][j]=Z[i][j];
+			Q[i][j]=Z[2-i][j];
 			length[i]+=pow(Q[i][j],2);
 		}
 		length[i]=sqrt(length[i]);

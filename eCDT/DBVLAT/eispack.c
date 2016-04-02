@@ -1675,11 +1675,10 @@ int rs ( int n, double a[], double w[], int matz, double z[] )
   }
   else
   {
-	printf("Since I call this function with MATZ being 1, I think I will step into this else part.\n");
     fv1 = ( double * ) malloc ( n * sizeof ( double ) );
 
     tred2 ( n, a, w, fv1, z );
-    printf("At least first function returned.\n");
+
     ierr = tql2 ( n, w, fv1, z );
 
     free ( fv1 );
