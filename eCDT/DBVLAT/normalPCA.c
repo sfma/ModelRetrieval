@@ -43,6 +43,7 @@ void normalPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer n
 	 * m is the total number of points sampled on the surface.
 	 */
 	//First, triangle the model
+
 	pTri myTriangle; // for all the triangles
 	double *area; //area for each triangle
 	double totalArea=0;
@@ -77,10 +78,12 @@ void normalPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer n
 	/*char ftri[100]="/Users/sfma/Desktop/triangleModel.obj";
 	SaveObj(ftri,vertex,myTriangle,NumVer,NumMyTri);*/
 
-	/*Randomly sampling is slightly different from pointPCA. What they have in common is that they both sample points.
-	 * The difference is that, normalPCA also use vertices on the trianle.
-	 */
-	printf("here? Before normals.\n");
+
+
+	//Randomly sampling is slightly different from pointPCA. What they have in common is that they both sample points.
+	 // The difference is that, normalPCA also use vertices on the trianle.
+	 //
+	//printf("here? Before normals.\n");
 	double *normals[3];
 	for(i=0;i<3;i++){
 		normals[i]=(double *)malloc(m*sizeof(double));
@@ -88,14 +91,13 @@ void normalPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer n
 	pVer pSamples=(pVer)malloc(m*sizeof(Ver));
 	k=0;
 	//printf("totalarea of %d faces is %f.\n",NumMyTri,totalArea);
-	int l,p,q;
 	for(i=0;i<NumMyTri;i++){
 		//printf("Area of %dth triangle is %f.\n",i,area[i]);
 		int numSamples=(int)(area[i]/totalArea*m);
 		for(j=0;j<numSamples;j++){
-			/*if(i<100){
-				printf("This time the algorithm selects face %d, its area is %f, while total area is %f.\n",i,area[i],totalArea);
-			}*/
+			//if(i<100){
+			//	printf("This time the algorithm selects face %d, its area is %f, while total area is %f.\n",i,area[i],totalArea);
+			//}
 			pSamples[k]=generatePoints(vertex,myTriangle[i]);
 			//use the sampled point and two vertices of a triangle to generate the normal
 			vector tmpvec1, tmpvec2;
@@ -159,14 +161,14 @@ void normalPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer n
 	free(area);
 	//Points generated.
 	//write the samples to an off file and open the off file to see if it maintain the object' shape.
-	/*char fSamples[100]="/Users/sfma/Desktop/samples.off";
-	FILE *fsam=fopen(fSamples,"w");
-	fprintf(fsam,"OFF\n");
-	fprintf(fsam,"%d %d %d\n",m, NumMyTri,0);
-	for(i=0;i<m;i++){
-		fprintf(fsam,"%f %f %f\n",pSamples[i].coor[0],pSamples[i].coor[1],pSamples[i].coor[2]);
-	}
-	fclose(fsam);*/
+	//char fSamples[100]="/Users/sfma/Desktop/samples.off";
+	//FILE *fsam=fopen(fSamples,"w");
+	//fprintf(fsam,"OFF\n");
+	//fprintf(fsam,"%d %d %d\n",m, NumMyTri,0);
+	//for(i=0;i<m;i++){
+	//	fprintf(fsam,"%f %f %f\n",pSamples[i].coor[0],pSamples[i].coor[1],pSamples[i].coor[2]);
+	//}
+	//fclose(fsam);//
 
 	//Find the center of the normals
 	double *normalCenter;
@@ -288,31 +290,6 @@ void normalPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer n
 		printf("\n");
 	}
 
-	//Check if rows of Q are orthonormal vectors
-	double qsum0=0,qsum1=0,qsum2=0;
-	for(i=0;i<3;i++){
-		qsum0+=Q[0][0]*Q[1][0]+Q[0][1]*Q[1][1]+Q[0][2]*Q[1][2];
-		qsum1+=Q[0][0]*Q[2][0]+Q[0][1]*Q[2][1]+Q[0][2]*Q[2][2];
-		qsum2+=Q[1][0]*Q[2][0]+Q[1][1]*Q[2][1]+Q[1][2]*Q[2][2];
-	}
-	if(qsum0==0){
-		if(qsum1==0){
-			if(qsum2==0){
-				printf("orthonormal.\n");
-			}
-			else{
-				printf("qsum2!=0\n");
-				printf("qsum2=%f\n",qsum2);
-			}
-		}
-		printf("qsum1!=0\n");
-		printf("qsum1=%f\n",qsum1);
-	}
-	else{
-		printf("qsum0!=0\n");
-		printf("qsum0=%f.\n",qsum0);
-	}
-
 	//Create matrix P'
 	double *P1[3];//P'
 	for(i=0;i<3;i++){
@@ -342,52 +319,70 @@ void normalPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer n
 		}
 	}
 
-	printf("=======F=============\n");
+	//printf("=======F=============\n");
 	double F[3][3];
 	for(i=0;i<3;i++){
 		for(j=0;j<3;j++){
 			if(j==i){
 				F[i][j]=sign(f[j]);
-				printf("%f\t",F[i][j]);
+				//printf("%f\t",F[i][j]);
 			}
 			else{
 				F[i][j]=0;
 			}
 		}
 	}
-	printf("\n");
+	//printf("\n");
 
 	//free P'
 	for(i=0;i<3;i++){
 		free(P1[i]);
 	}
 
+
+
 	//matrix V and V'
-	double *V[3], *V1[3];
+	//int i,j,k;
+	double *V[3];
+	double *V1[3];
 	for(i=0;i<3;i++){
 		V[i]=(double *)malloc(NumVer*sizeof(double));
-		V1[i]=(double *)malloc(NumVer*sizeof(double));
-	}
-
-	for(i=0;i<3;i++){
-		for(j=0;j<m;j++){
-			V[i][j]=vertex[j].coor[i];
+		//V1[i]=(double *)malloc(NumVer*sizeof(double));
+		if(V[i]==NULL){
+			printf("Space allocation for V[%d] failed.\n",i);
 		}
+		//if(V1[i]==NULL){
+		//	printf("Space allocation for V1[%d] failed.\n",i);
+		//}
+	}
+	printf("Successfully allocate space for V and V1.\n");
+	printf("=============V initialized===================\n");
+	printf("First we need to identify if vertex is still valid.\n");
+	if(vertex==NULL){
+		printf("Invalid pointer vertex.\n");
+	}
+	for(i=0;i<3;i++){
+		for(j=0;j<NumVer;j++){
+			V[i][j]=vertex[j].coor[i];
+			printf("%f\t",V[i][j]);
+		}
+		printf("\n");
 	}
 	//double *verticesCenter;
 	//verticesCenter=FindNormalCenter(V,NumVer);
+
 	double verticesCenter[3]={0,0,0};
-	printf("==============Center of Vertices===============\n");
-	for(i=0;i<3;i++){
-		printf("%f\t",verticesCenter[i]);
-	}
-	printf("\n");
+	printf("================V=================\n");
 	for(i=0;i<3;i++)
 	{
 		for(j=0;j<NumVer;j++){
 			V[i][j]=vertex[j].coor[i]-verticesCenter[i];
+			printf("%f\t",V[i][j]);
 		}
+		printf("\n");
 	}
+
+
 
 	printf("tmp=FQ\n");
 	double tmp[3][3];
@@ -402,14 +397,19 @@ void normalPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer n
 		}
 		printf("\n");
 	}
+	printf("============V1==============\n");
 	for(i=0;i<3;i++){
+		//printf("i=%d\n",i);
 		for(j=0;j<NumVer;j++){
+			//printf("j=%d\n",j);
 			double sum=0;
 			for(k=0;k<3;k++){
 				sum+=tmp[i][k]*V[k][j];
 			}
 			V1[i][j]=sum;
+			printf("%f\t",V1[i][j]);
 		}
+		printf("\n");
 	}
 
 	//Scale
@@ -421,20 +421,23 @@ void normalPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer n
 			maxDist=dist;
 		}
 	}
+	printf("============V1 normalized=========\n");
 	for(i=0;i<3;i++){
 		for(j=0;j<NumVer;j++){
 			V1[i][j]/=maxDist;
+			printf("%f\t",V1[i][j]);
 		}
+		printf("\n");
 	}
 
-	/*char fv1Name[100]="/Users/sfma/Desktop/v1.off";
+	char fv1Name[100]="/Users/sfma/Desktop/v1.off";
 	FILE *fv1=fopen(fv1Name,"w");
 	fprintf(fv1,"OFF\n");
 	fprintf(fv1,"%d %d %d\n",m, 0,0);
 	for(i=0;i<m;i++){
 		fprintf(fv1,"%f %f %f\n",V1[0][i],V1[1][i],V1[2][i]);
 	}
-	fclose(fv1);*/
+	fclose(fv1);
 
 	//pVer newVertex=(pVer)malloc(NumVer*sizeof(Ver));
 	for(i=0;i<NumVer;i++){
@@ -443,9 +446,20 @@ void normalPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer n
 		newVertex[i].coor[2]=V1[2][i];
 	}
 
+
+	printf("About to free V and V1.\n");
 	for(i=0;i<3;i++){
+		printf("i=%d\n",i);
 		free(V[i]);
-		free(V1[i]);
+		printf("V[%d] freed.\n",i);
 	}
+
+	for(i=0;i<3;i++){
+		printf("i=%d\n",i);
+		free(V1[i]);
+		printf("V1[%d] freed.\n",i);
+	}
+
+	printf("End of normalPCA.\n");
 
 }
