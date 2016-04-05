@@ -22,6 +22,7 @@
 
 //Function declaration
 double *FindNormalCenter(double **normals, int m);
+void verticesInfo(pVer vertex, int NumVer);
 void normalPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer newVertex);
 
 double *FindNormalCenter(double **normals, int m){
@@ -38,12 +39,24 @@ double *FindNormalCenter(double **normals, int m){
 	return center;
 }
 
+void verticesInfo(pVer vertex, int NumVer){
+	//Print coordinates of vertices
+	int i,j;
+	for(i=0;i<NumVer;i++){
+		for(j=0;j<3;j++){
+			printf("%f\t",vertex[i].coor[j]);
+		}
+		printf("\n");
+	}
+}
+
 void normalPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer newVertex){
 	/*
 	 * m is the total number of points sampled on the surface.
 	 */
-	//First, triangle the model
 
+	//verticesInfo(vertex, NumVer);
+	//First, triangle the model
 	pTri myTriangle; // for all the triangles
 	double *area; //area for each triangle
 	double totalArea=0;
@@ -77,6 +90,7 @@ void normalPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer n
 	//write the triangle model to see if it is right
 	/*char ftri[100]="/Users/sfma/Desktop/triangleModel.obj";
 	SaveObj(ftri,vertex,myTriangle,NumVer,NumMyTri);*/
+	//printf("Triangle model written.\n");
 
 
 
@@ -247,7 +261,13 @@ void normalPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer n
 	}
 	double W[3];
 	double Z[3][3];
-	rs(3,A,W,1,Z);
+	double Z1[3*3];
+	rs(3,A,W,1,Z1);
+	for(i=0;i<3;i++){
+		for(j=0;j<3;j++){
+			Z[i][j]=Z1[i*3+j];
+		}
+	}
 	printf("====W====\n");
 	for(i=0;i<3;i++){
 		printf("%f\n",W[i]);
@@ -347,13 +367,13 @@ void normalPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer n
 	double *V1[3];
 	for(i=0;i<3;i++){
 		V[i]=(double *)malloc(NumVer*sizeof(double));
-		//V1[i]=(double *)malloc(NumVer*sizeof(double));
+		V1[i]=(double *)malloc(NumVer*sizeof(double));
 		if(V[i]==NULL){
 			printf("Space allocation for V[%d] failed.\n",i);
 		}
-		//if(V1[i]==NULL){
-		//	printf("Space allocation for V1[%d] failed.\n",i);
-		//}
+		if(V1[i]==NULL){
+			printf("Space allocation for V1[%d] failed.\n",i);
+		}
 	}
 	printf("Successfully allocate space for V and V1.\n");
 	printf("=============V initialized===================\n");
@@ -368,10 +388,10 @@ void normalPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer n
 		}
 		printf("\n");
 	}
-	//double *verticesCenter;
-	//verticesCenter=FindNormalCenter(V,NumVer);
+	double *verticesCenter;
+	verticesCenter=FindNormalCenter(V,NumVer);
 
-	double verticesCenter[3]={0,0,0};
+	//double verticesCenter[3]={0,0,0};
 	printf("================V=================\n");
 	for(i=0;i<3;i++)
 	{
@@ -430,16 +450,16 @@ void normalPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer n
 		printf("\n");
 	}
 
-	char fv1Name[100]="/Users/sfma/Desktop/v1.off";
+	/*char fv1Name[100]="/Users/sfma/Desktop/v1.off";
 	FILE *fv1=fopen(fv1Name,"w");
 	fprintf(fv1,"OFF\n");
 	fprintf(fv1,"%d %d %d\n",m, 0,0);
 	for(i=0;i<m;i++){
 		fprintf(fv1,"%f %f %f\n",V1[0][i],V1[1][i],V1[2][i]);
 	}
-	fclose(fv1);
+	fclose(fv1);*/
 
-	//pVer newVertex=(pVer)malloc(NumVer*sizeof(Ver));
+	//pVer newVertex=(pVer)malloc(NumVer*sizeof(Ver));  //newVertex has already been malloced in the caller function.
 	for(i=0;i<NumVer;i++){
 		newVertex[i].coor[0]=V1[0][i];
 		newVertex[i].coor[1]=V1[1][i];

@@ -8,6 +8,7 @@
  */
 #include "Ds.h"
 #include "RWObj.h"
+#include "pointPCA.h"
 #include "normalPCA.h"
 #include "RWOFF.h"
 #include <string.h>
