@@ -9,6 +9,7 @@ C_SRCS += \
 ../RWOFF.c \
 ../RWObj.c \
 ../Rotate.c \
+../TranslateScale.c \
 ../eispack.c \
 ../normalPCA.c \
 ../pointPCA.c \
@@ -23,6 +24,7 @@ OBJS += \
 ./RWOFF.o \
 ./RWObj.o \
 ./Rotate.o \
+./TranslateScale.o \
 ./eispack.o \
 ./normalPCA.o \
 ./pointPCA.o \
@@ -37,6 +39,7 @@ C_DEPS += \
 ./RWOFF.d \
 ./RWObj.d \
 ./Rotate.d \
+./TranslateScale.d \
 ./eispack.d \
 ./normalPCA.d \
 ./pointPCA.d \

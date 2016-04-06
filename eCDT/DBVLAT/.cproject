@@ -49,6 +49,7 @@
 								<option id="gnu.c.compiler.macosx.exe.debug.option.debugging.level.78883369" name="Debug Level" superClass="gnu.c.compiler.macosx.exe.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.364024020" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="/opt/X11/include"/>
+									<listOptionValue builtIn="false" value="/Users/sfma/Downloads/vlfeat-0.9.20_bin/vl"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.2116845341" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>

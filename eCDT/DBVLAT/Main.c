@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <GL/glut.h>
+#include "dsift.h"
 #include "RWOBJ.h"
 #include "TranslateScale.h"
 
@@ -29,7 +30,7 @@ pVer vertex1,vertex2;
 pTri triangle1, triangle2;
 int NumVer1, NumTri1, NumVer2, NumTri2;
 
-pVer Translate1,Translate2;
+Ver Translate1,Translate2;
 double Scale1, Scale2;
 
 
@@ -116,7 +117,7 @@ void keyboard(unsigned char key, int x, int y){
 
 	//printf("keyboard function.\n");
 
-	double feature[NumCam][Dimension];
+	float feature[NumCam][Dimension];
 
 	unsigned char *dphImages[NumCam]; //dphimage is an array of pointers
 	Ver cameras[NumCam];
@@ -155,8 +156,31 @@ void keyboard(unsigned char key, int x, int y){
 			//printf("Model read.\n");
 
 			//Translation and scale normalization
+			TranslateScale(vertex1, NumVer1, triangle1, NumTri1, line, &Translate1, &Scale1);
+
 			for(i=0;i<NumCam;i++){
 				myRenderToMem(dphImages[i],cameras+i,vertex1,triangle1,NumVer1,NumTri1);
+				//feature extraction: dsift
+				//First, initialize a dsift filter object by vl_dsift_new.
+				VlDsiftFilter *filter=vl_dsift(winWidth, winHeight);
+				//Customze the descriptor paramters
+				vl_dsift_set_steps(filter,4,4);
+				VlDsiftDescriptorGeometry *geom;
+				geom->numBinT=36;
+				geom->numBinX=20;
+				geom->numBinY=20;
+				geom->binSizeX=19;
+				geom->binSizeY=19;
+				vl_dsift_set_geometry(filter, geom);
+				//Process an image by vl_dsift_process
+				vl_dsift_process(filter,dphImages[i]);
+				//Retrieve the number of keypoints, keypoints, and their descriptors
+				int numKeypoint;
+				numKeypoint=vl_dsift_get_keypoint_num(filter);
+				VlDsiftKeypoint const *pkeypoint=vl_dsift_get_keypoints(filter);
+				feature[i]=vl_dsift_get_descriptors(filter);
+				//delte the dsift filter
+				vl_dsift_delete(filter);
 			}
 		}
 
