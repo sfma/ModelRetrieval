@@ -117,7 +117,8 @@ void keyboard(unsigned char key, int x, int y){
 
 	//printf("keyboard function.\n");
 
-	float *feature[NumCam];
+	float *feature[NumModel][NumCam];
+	int numKeypoints[NumCam];
 
 	unsigned char *dphImages[NumCam]; //dphimage is an array of pointers
 	Ver cameras[NumCam];
@@ -131,7 +132,7 @@ void keyboard(unsigned char key, int x, int y){
 
 
 
-	int i,k;
+	int i,j,k;
 	switch(key){
 	case 'n':
 		//First, read a model from a file
@@ -160,35 +161,45 @@ void keyboard(unsigned char key, int x, int y){
 
 			for(i=0;i<NumCam;i++){
 				myRenderToMem(dphImages[i],cameras+i,vertex1,triangle1,NumVer1,NumTri1);
+				printf("Depth images done.\n");
 				//feature extraction: dsift
 				//First, initialize a dsift filter object by vl_dsift_new.
-				VlDsiftFilter *filter=vl_dsift(winWidth, winHeight);
+				VlDsiftFilter *filter=vl_dsift_new(winWidth, winHeight);
 				//Customze the descriptor paramters
-				vl_dsift_set_bounds(filter,9,9,(winWidth-9),(winHeight-9));
+				vl_dsift_set_bounds(filter,9,9,(winWidth-1-9),(winHeight-1-9));
 				vl_dsift_set_steps(filter,4,4);
 				VlDsiftDescriptorGeometry *geom;
 				geom->numBinT=36;
 				geom->binSizeX=19;
 				geom->binSizeY=19;
-				geom->numBinX=(int)((winWidth-geom->binSizeX-1)/geom->binSizeX);
-				geom->numBinY=(int)((winHeight-geom->binSizeY-1)/geom->binSizeY);
+				geom->numBinX=12; //winWidth/(patchSizeX+step)*4
+				geom->numBinY=12;
 				vl_dsift_set_geometry(filter, geom);
 				//Process an image by vl_dsift_process
-				vl_dsift_process(filter,dphImages[i]);
+				float *fimage=(float *)malloc(winWidth*winHeight*sizeof(float));
+				int size=winWidth*winHeight;
+				for(j=0;j<size;j++){
+					fimage[j]=(float)dphImages[i][j];
+				}
+				vl_dsift_process(filter,fimage); //the second parameter of this function is float const *
+				free(fimage);
 				//Retrieve the number of keypoints, keypoints, and their descriptors
-				int numKeypoint;
-				numKeypoint=vl_dsift_get_keypoint_num(filter);
+				numKeypoints[i]=vl_dsift_get_keypoint_num(filter);
+				//feature[i]=(float *)malloc(numKeypoints[i]*128);
+				feature[k][i]=(float *)malloc(numKeypoints[i]*128*sizeof(float));
 				VlDsiftKeypoint const *pkeypoint=vl_dsift_get_keypoints(filter);
-				feature[i]=vl_dsift_get_descriptors(filter);
+				feature[k][i]=vl_dsift_get_descriptors(filter);
 				//delte the dsift filter
 				vl_dsift_delete(filter);
 			}
+			k++;
 		}
 
 
 		for(i=0;i<NumCam;i++){
 			free(dphImages[i]);
 		}
+		break;
 	}
 }
 

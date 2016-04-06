@@ -22,11 +22,13 @@
 							<tool id="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.debug.455796106" name="MacOS X C Linker" superClass="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.debug">
 								<option id="macosx.c.link.option.libs.616817292" name="Libraries (-l)" superClass="macosx.c.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="gl"/>
+									<listOptionValue builtIn="false" value="vl"/>
 									<listOptionValue builtIn="false" value="glu"/>
 									<listOptionValue builtIn="false" value="glut"/>
 								</option>
 								<option id="macosx.c.link.option.paths.714210113" name="Library search path (-L)" superClass="macosx.c.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="/opt/X11/lib"/>
+									<listOptionValue builtIn="false" value="/Users/sfma/Downloads/vlfeat-0.9.20_bin/bin/maci64"/>
 								</option>
 								<option id="macosx.c.link.option.shared.1992519146" name="Shared (-dynamiclib)" superClass="macosx.c.link.option.shared" value="false" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.macosx.c.linker.input.1334807111" superClass="cdt.managedbuild.tool.macosx.c.linker.input">
