@@ -117,7 +117,7 @@ void keyboard(unsigned char key, int x, int y){
 
 	//printf("keyboard function.\n");
 
-	float feature[NumCam][Dimension];
+	float *feature[NumCam];
 
 	unsigned char *dphImages[NumCam]; //dphimage is an array of pointers
 	Ver cameras[NumCam];
@@ -164,13 +164,14 @@ void keyboard(unsigned char key, int x, int y){
 				//First, initialize a dsift filter object by vl_dsift_new.
 				VlDsiftFilter *filter=vl_dsift(winWidth, winHeight);
 				//Customze the descriptor paramters
+				vl_dsift_set_bounds(filter,9,9,(winWidth-9),(winHeight-9));
 				vl_dsift_set_steps(filter,4,4);
 				VlDsiftDescriptorGeometry *geom;
 				geom->numBinT=36;
-				geom->numBinX=20;
-				geom->numBinY=20;
 				geom->binSizeX=19;
 				geom->binSizeY=19;
+				geom->numBinX=(int)((winWidth-geom->binSizeX-1)/geom->binSizeX);
+				geom->numBinY=(int)((winHeight-geom->binSizeY-1)/geom->binSizeY);
 				vl_dsift_set_geometry(filter, geom);
 				//Process an image by vl_dsift_process
 				vl_dsift_process(filter,dphImages[i]);
