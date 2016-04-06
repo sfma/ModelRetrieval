@@ -73,7 +73,7 @@ int ReadObj(char *filename, pVer *vertex, pTri *triangle, int *NumVer, int *NumT
 	char			fname[400];
 	
 	sprintf(fname, "%s.obj", filename);
-	printf("%s\n",fname);
+	//printf("%s\n",fname);
 	if( (fpt = fopen(fname, "r")) == NULL )
 		return 0;	// False
 
@@ -110,6 +110,9 @@ int ReadObj(char *filename, pVer *vertex, pTri *triangle, int *NumVer, int *NumT
 	}
 	*NumVer = numver;
 	*NumTri = numtri;
+
+	//printf("numver: %d.\n", numver);
+	//printf("numtri: %d.\n", numtri);
 
 	// allocate memory of vertex and triangle
 	*vertex = (pVer) malloc( numver * sizeof(Ver));

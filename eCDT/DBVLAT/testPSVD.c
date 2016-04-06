@@ -17,15 +17,15 @@
 
 #define m 1000
 
-//int testPSVD(){
-int main(){
+int testPSVD(){
+//int main(){
 	char prefix[100]="/Users/sfma/3Dretrieval/Executable/pton_obj_data/";
 	char filename1[100];
 	char filename2[100];
 	strcpy(filename1,prefix);
 	strcpy(filename2,prefix);
-	strcat(filename1,"m70");
-	strcat(filename2,"m71");
+	strcat(filename1,"m570");
+	strcat(filename2,"m571");
 	pVer vertex1, vertex2;
 	pTri triangle1, triangle2;
 	int NumVer1, NumVer2;
@@ -53,10 +53,10 @@ int main(){
 	//pointSVD(m, vertex1, NumVer1, triangle1, NumTri1, newVertex1);
 	//pointSVD(m, vertex2, NumVer2, triangle2, NumTri2, newVertex2);
 
-	//pointPCA(m, vertex1, NumVer1, triangle1, NumTri1, newVertex1);
-	//pointPCA(m, vertex2, NumVer2, triangle2, NumTri2, newVertex2);
-	normalPCA(m, vertex1, NumVer1, triangle1, NumTri1, newVertex1);
-	normalPCA(m, vertex2, NumVer2, triangle2, NumTri2, newVertex2);
+	pointPCA(m, vertex1, NumVer1, triangle1, NumTri1, newVertex1);
+	pointPCA(m, vertex2, NumVer2, triangle2, NumTri2, newVertex2);
+	//normalPCA(m, vertex1, NumVer1, triangle1, NumTri1, newVertex1);
+	//normalPCA(m, vertex2, NumVer2, triangle2, NumTri2, newVertex2);
 	free(vertex1);
 	free(vertex2);
 	char out1[100],out2[100];
