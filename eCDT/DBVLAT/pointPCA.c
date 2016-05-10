@@ -38,6 +38,7 @@ void pointPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer ne
 	}
 	myTriangle=(pTri)malloc(NumMyTri*sizeof(Tri));
 	area=(double *)malloc(NumMyTri*sizeof(double));
+	/*
 	j=0;
 	for(i=0;i<NumTri;i++){
 		myTriangle[j].v[0]=triangle[i].v[0];
@@ -56,6 +57,26 @@ void pointPCA(int m, pVer vertex, int NumVer, pTri triangle, int NumTri, pVer ne
 				myTriangle[j].v[0]=triangle[i].v[0];
 				myTriangle[j].v[1]=triangle[i].v[1];
 			}
+		}
+	}
+	*/
+
+	//new triangulation part
+	j=0; //index of newly generated trangle
+	for(i=0;i<NumTri;i++){
+		myTriangle[j].v[0]=triangle[i].v[0];
+		myTriangle[j].v[1]=triangle[i].v[1];
+		myTriangle[j].v[2]=triangle[i].v[2];
+		myTriangle[j].NodeName=3;
+		area[j]=AreaOfTri(vertex, myTriangle[j]);
+		j++;
+		while(j<(triangle[i].NodeName-1)){
+			//myTriangle[j].v[1]=myTriangle[j-1].v[2];
+			myTriangle[j].v[1]=triangle[i].v[j];
+			myTriangle[j].v[2]=triangle[i].v[j+1];
+			myTriangle[j].NodeName=3;
+			area[j]=AreaOfTri(vertex, myTriangle[j]);
+			j++;
 		}
 	}
 	//write the triangle model to see if it is right
